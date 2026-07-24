@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grid Position Calculator — Cerberus Trading OS</title>
+<meta name="description" content="Free grid trading position calculator. Calculate optimal grid levels, spacing, and expected returns for your crypto grid trading strategy.">
+<style>
+  :root { --bg: #0A1128; --surface: #111B3A; --gold: #FFD700; --text: #E0E0E0; --accent: #00D4AA; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+  .container { max-width: 720px; width: 100%; }
+  h1 { color: var(--gold); font-size: 1.4em; margin: 20px 0 5px; letter-spacing: 1px; }
+  .subtitle { color: #888; font-size: 0.85em; margin-bottom: 25px; }
+  .card { background: var(--surface); border: 1px solid #1a2a5a; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card h2 { color: var(--gold); font-size: 1em; margin-bottom: 16px; }
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .input-group { margin-bottom: 4px; }
+  .input-group label { display: block; font-size: 0.78em; color: #999; margin-bottom: 4px; }
+  .input-group input, .input-group select { width: 100%; padding: 8px 10px; background: #0D1635; border: 1px solid #1a2a5a; border-radius: 6px; color: var(--text); font-size: 0.9em; font-family: monospace; }
+  .input-group input:focus { outline: none; border-color: var(--gold); }
+  button { background: var(--gold); color: #0A1128; border: none; border-radius: 8px; padding: 12px 24px; font-size: 1em; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; font-family: inherit; }
+  button:hover { background: #E6C200; }
+  .results { margin-top: 16px; }
+  .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a2a5a; font-size: 0.9em; }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .label { color: #999; }
+  .result-row .value { color: var(--accent); font-weight: 600; }
+  .result-row .value.gold { color: var(--gold); }
+  .grid-visual { margin-top: 16px; display: flex; flex-direction: column-reverse; gap: 2px; }
+  .grid-level { display: flex; align-items: center; gap: 8px; font-size: 0.75em; padding: 3px 8px; border-radius: 4px; }
+  .grid-level.buy { background: rgba(0, 212, 170, 0.1); color: var(--accent); }
+  .grid-level.sell { background: rgba(255, 215, 0, 0.1); color: var(--gold); }
+  .grid-level.entry { background: rgba(255, 255, 255, 0.1); color: white; font-weight: 700; }
+  .grid-level .bar { flex: 1; height: 4px; border-radius: 2px; }
+  .grid-level.buy .bar { background: var(--accent); }
+  .grid-level.sell .bar { background: var(--gold); }
+  .grid-level.entry .bar { background: white; }
+  .footer { text-align: center; margin: 30px 0; font-size: 0.78em; color: #555; }
+  .footer a { color: var(--gold); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+  @media (max-width: 500px) { .input-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⚡ Grid Position Calculator</h1>
+  <p class="subtitle">Calculate optimal grid levels, spacing, and returns for crypto grid trading</p>
+
+  <div class="card">
+    <h2>Parameters</h2>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Pair</label>
+        <select id="pair"><option>SOL/USD</option><option>ETH/USD</option><option>BTC/USD</option><option>XLM/USD</option><option>DOGE/USD</option><option>ADA/USD</option><option>AVAX/USD</option><option>SUI/USD</option></select>
+      </div>
+      <div class="input-group">
+        <label>Current Price ($)</label>
+        <input type="number" id="price" step="0.01" value="168.50">
+      </div>
+      <div class="input-group">
+        <label>Budget ($)</label>
+        <input type="number" id="budget" value="200">
+      </div>
+      <div class="input-group">
+        <label>Grid Levels</label>
+        <input type="number" id="levels" value="5" min="2" max="20">
+      </div>
+      <div class="input-group">
+        <label>Grid Range (%)</label>
+        <input type="number" id="range" value="15" min="2" max="50">
+      </div>
+      <div class="input-group">
+        <label>Maker Fee (%)</label>
+        <input type="number" id="fee" step="0.01" value="0.16">
+      </div>
+    </div>
+    <button onclick="calculate()">Calculate Grid</button>
+  </div>
+
+  <div class="card" id="results" style="display:none">
+    <h2>Grid Analysis</h2>
+    <div id="result-content"></div>
+    <h2 style="margin-top:20px">Grid Visualization</h2>
+    <div id="grid-visual" class="grid-visual"></div>
+  </div>
+
+  <div class="footer">
+    Built with Cerberus Trading OS v4.1 — <a href="https://ratefoundry.gumroad.com/l/xrtjjv" target="_blank">Get the full system →</a>
+  </div>
+</div>
+
+<script>
+function calculate() {
+  const price = parseFloat(document.getElementById('price').value);
+  const budget = parseFloat(document.getElementById('budget').value);
+  const levels = parseInt(document.getElementById('levels').value);
+  const rangePct = parseFloat(document.getElementById('range').value);
+  const fee = parseFloat(document.getElementById('fee').value);
+
+  const spacingPct = rangePct / levels;
+  const halfRange = rangePct / 2;
+  const buyStart = price * (1 - halfRange / 100);
+  const sellStart = price * (1 + halfRange / 100);
+  const perLevel = budget / levels;
+  const feeRoundTrip = fee * 2;
+  const minProfitable = feeRoundTrip / spacingPct * 100;
+
+  let html = '';
+  html += `<div class="result-row"><span class="label">Price Range</span><span class="value gold">$${buyStart.toFixed(2)} — $${sellStart.toFixed(2)}</span></div>`;
+  html += `<div class="result-row"><span class="label">Grid Spacing</span><span class="value">${spacingPct.toFixed(2)}%</span></div>`;
+  html += `<div class="result-row"><span class="label">Per Level</span><span class="value">$${perLevel.toFixed(2)}</span></div>`;
+  html += `<div class="result-row"><span class="label">Total Invested</span><span class="value gold">$${budget.toFixed(2)}</span></div>`;
+  html += `<div class="result-row"><span class="label">Round-Trip Fee</span><span class="value">${feeRoundTrip.toFixed(2)}%</span></div>`;
+  html += `<div class="result-row"><span class="label">Min Profitable Spacing</span><span class="value ${feeRoundTrip / spacingPct > 0.5 ? 'gold' : ''}">${feeRoundTrip.toFixed(2)}% (need >${(feeRoundTrip/0.8).toFixed(2)}% for 80% win rate)</span></div>`;
+
+  // Expected monthly return estimate
+  const expectedFillsPerDay = Math.max(1, Math.round(3 * (spacingPct / 2)));
+  const profitPerFill = perLevel * (spacingPct / 100) - (perLevel * feeRoundTrip / 100);
+  const monthlyEst = profitPerFill * expectedFillsPerDay * 30;
+
+  html += `<div class="result-row"><span class="label">Est. Daily Fills</span><span class="value">~${expectedFillsPerDay}</span></div>`;
+  html += `<div class="result-row"><span class="label">Est. Profit / Fill</span><span class="value">$${profitPerFill.toFixed(2)}</span></div>`;
+  html += `<div class="result-row"><span class="label">Est. Monthly Return</span><span class="value gold">$${monthlyEst.toFixed(2)} (${(monthlyEst/budget*100).toFixed(1)}%)</span></div>`;
+  html += `<div class="result-row"><span class="label" style="color:#666">* Estimates based on avg market vol</span><span class="value" style="color:#666">Not financial advice</span></div>`;
+
+  document.getElementById('result-content').innerHTML = html;
+
+  // Grid visualization
+  const steps = [];
+  const stepSize = (sellStart - buyStart) / (levels * 2);
+  for (let i = levels; i >= 1; i--) {
+    const buyPrice = buyStart + (i - 1) * (sellStart - buyStart) / levels;
+    const sellPrice = buyPrice * (1 + spacingPct / 100);
+    const entry = Math.abs(buyPrice - price) < (sellStart - buyStart) / levels / 2;
+    steps.push({ type: 'buy', price: buyPrice, level: i });
+    if (entry) steps.push({ type: 'entry', price: price, level: 0 });
+  }
+  steps.sort((a, b) => b.price - a.price);
+
+  let visHtml = '';
+  const maxPrice = Math.max(...steps.filter(s => s.type !== 'entry').map(s => s.price));
+  const minPrice = Math.min(...steps.filter(s => s.type !== 'entry').map(s => s.price));
+  const range = maxPrice - minPrice || 1;
+
+  for (const s of steps) {
+    const pct = ((s.price - minPrice) / range * 100);
+    const cls = s.type === 'buy' ? 'buy' : s.type === 'sell' ? 'sell' : 'entry';
+    const label = s.type === 'entry' ? '← CURRENT PRICE' : s.type === 'buy' ? `Buy L${s.level}` : 'Sell';
+    visHtml += `<div class="grid-level ${cls}"><span style="width:90px">${label}</span><div class="bar" style="width:${pct}%"></div><span>$${s.price.toFixed(2)}</span></div>`;
+  }
+
+  document.getElementById('grid-visual').innerHTML = visHtml;
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Calculate on load with defaults
+window.onload = calculate;
+</script>
+</body>
+</html>
