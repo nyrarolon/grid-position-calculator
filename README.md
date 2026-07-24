@@ -1,25 +1,43 @@
 # Grid Position Calculator
 
-A free, browser-based grid trading position calculator for crypto traders. Calculate optimal grid levels, spacing, and expected returns.
+A free, browser-based **grid trading position calculator** for crypto traders. No server, no data collection — just pure math in your browser.
 
-[**Use the calculator →**](https://etherset.github.io/grid-position-calculator/)
+**🔗 Live: https://nyrarolon.github.io/grid-position-calculator/**
 
 ## Features
 
-- Calculate optimal grid levels based on budget and volatility
-- Visual grid visualization showing buy/sell levels
-- Expected monthly return estimates
-- Fee-aware (factors in maker/taker fees)
-- Works entirely in browser — no data sent anywhere
+- Calculate optimal grid levels based on budget and market volatility
+- Visual grid visualization showing buy/sell levels and current price
+- Fee-aware profit analysis — accounts for maker/taker fee erosion
+- Expected monthly return estimates based on grid configuration
+- Works entirely in your browser — nothing is sent to any server
 
-## Why This Exists
+## Why Grid Spacing Matters
 
-Grid trading is simple in theory but easy to get wrong. Most traders don't account for fee erosion on tight grids. This calculator shows you the minimum profitable spacing before you deploy capital.
+Most new grid traders set spacing too tight. If your round-trip fee is 0.32% and your grid spacing is 0.5%, you're losing money on every cycle. This calculator shows you the minimum profitable spacing before you deploy capital.
 
-## License
+## What the Numbers Tell You
 
-MIT — free to use, modify, share.
+| Input | What it does |
+|-------|-------------|
+| Budget | How much capital to deploy per pair |
+| Grid Levels | Number of buy/sell order pairs |
+| Grid Range | Total price range as % from current |
+| Maker Fee | Your exchange maker fee (Kraken = 0.16%, Binance = 0.10%) |
+
+## Example
+
+Input: $200 budget, 5 levels, 15% range on SOL at $168.50
+Output: 3.0% spacing, $40 per level, ~$5.40/mo estimated return at average market volatility.
+
+## Built With
+
+Pure HTML + CSS + JavaScript. No dependencies, no build step. Download and open locally or use the hosted version.
 
 ---
 
-*Built with [Cerberus Trading OS](https://ratefoundry.gumroad.com/l/xrtjjv) — the autonomous crypto trading system.*
+**Want the full automated trading system?** Check out [Cerberus Trading OS](https://ratefoundry.gumroad.com/l/xrtjjv) — three-layer grid trading with recursive learning engine. $97 one-time.
+
+## License
+
+MIT
