@@ -38,6 +38,13 @@ Pure HTML + CSS + JavaScript. No dependencies, no build step. Download and open 
 
 **Want the full automated trading system?** Check out [Cerberus Trading OS](https://ratefoundry.gumroad.com/l/xrtjjv) — three-layer grid trading with recursive learning engine. $97 one-time.
 
+## 📊 Free Resources
+
+| Resource | Description | Link |
+|----------|-------------|------|
+| **Grid Position Calculator** | Browser-based tool for optimal grid levels | [Live Demo](https://nyrarolon.github.io/grid-position-calculator/) |
+| **Grid Fee Analyzer** | Excel spreadsheet with formulas | [Download .xlsx](grid-fee-analyzer.xlsx) |
+| **Trading Edge Analysis** | Real P&L data across 95 cycles | [GitHub Gist](https://gist.github.com/nyrarolon/fb10d1e9283424e97d860f6a22706668) |
 ## License
 
 MIT
