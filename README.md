@@ -36,7 +36,7 @@ Pure HTML + CSS + JavaScript. No dependencies, no build step. Download and open 
 
 ---
 
-**Want the full automated trading system?** Check out [Cerberus Trading OS](https://ratefoundry.gumroad.com/l/xrtjjv) — three-layer grid trading with recursive learning engine. $97 one-time.
+**Want the full automated trading system?** Check out [Nyra Trading OS V3.0](https://ratefoundry.gumroad.com/l/nyra-trading-os) — the agent harness for trading. Feed it to any AI agent: 26 scripts, fee gate, kill switch, prop eval playbook. $97 one-time.
 
 ## 📊 Free Resources
 
